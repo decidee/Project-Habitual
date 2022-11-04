@@ -1,0 +1,13 @@
+__pycache__
+.env
+Flask_Config.py
+Hyper_Config.py
+Hyper.py
+Notes
+test.py
+dbtestroute.py
+clienttest.py
+Backlog - Notes
+LOGIN PAGE IDEA
+*.session
+Invite_gen.py
