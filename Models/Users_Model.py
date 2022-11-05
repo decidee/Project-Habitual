@@ -7,7 +7,6 @@ from sqlalchemy.dialects.postgresql import UUID
 from ..ext import db,login_manager
 
 
-
 @login_manager.user_loader
 def user_loader(user_id):
     user_search = User.query.get(user_id)
@@ -51,11 +50,10 @@ class User(db.Model,UserMixin):
 class Tele(db.Model):
     __tablename__ = "TeleAcc"
     id = db.Column(db.Integer,primary_key=True)
-    InviteCode = db.Column(db.String(50), unique = True, nullable=False)
     ApiId = db.Column(db.String(50))
     ApiHash = db.Column(db.String(128))
-    OwnerAcc = db.Column(db.ForeignKey('UserAcc.UID'))
-    SessionFile = db.Column(db.String(2000), nullable=False)
+    OwnerAcc = db.Column(db.ForeignKey('UserAcc.UID'),unique=True)
+    SessionFile = db.Column(db.String(2000), nullable=True)
 
 
 class Invites(db.Model):

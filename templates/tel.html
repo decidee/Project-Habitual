@@ -1,0 +1,31 @@
+{% extends 'Layout.html' %}
+
+{% block content %}
+
+
+<form method="POST" action="" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-outline mb-1">
+        {{ form.Api_Id.label (class="form-label") }}
+        {{ form.Api_Id (class="form-control") }}
+          {% for error in form.Api_Id.errors %}
+             <div class='' style="color:red;">
+                {{error}}
+            </div>
+          {% endfor %}
+          <br />
+    </div>
+    <div class="form-outline mb-1">
+        {{ form.Api_Hash.label (class="form-label") }}
+        {{ form.Api_Hash (class="form-control") }}
+        {% for error in form.Api_Hash.errors %}
+            <div class='' style="color:red;">
+                {{error}}
+            </div>
+        {% endfor %}
+        <br />
+       
+    </div>
+    {{ form.submit(class="btn btn-primary btn-block mb-4") }}
+</form>
+{% endblock content %}
