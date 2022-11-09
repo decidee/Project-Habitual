@@ -1,14 +1,19 @@
+import os
 from plistlib import UID
+from dotenv import load_dotenv
 from flask import render_template, redirect, url_for, request, Blueprint, session, flash
 from flask_login import login_user,current_user,logout_user, login_required
 
 from ..Forms.forms import RegisterationForm, LoginForm, TeleForm, TeleFormConfirmationCode
 from ..Models.Users_Model import User, Tele
 from ..ext import db, bcrypt
-
+import requests
 
 FrontG = Blueprint('FrontG',__name__,url_prefix='/')
 
+env_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
+load_dotenv(f"{env_dir}/.env")
+request_url = os.getenv('API_URL')
 
 
 @FrontG.route("/", methods=["GET"])
@@ -54,7 +59,6 @@ def login():
 @FrontG.route("/home")
 @login_required
 def home():
-    q = print(current_user)
     return render_template('home.html')
 
 
@@ -67,15 +71,20 @@ def telegramreg():
         db_add = Tele(ApiId=api_id,ApiHash=api_hash,OwnerAcc=current_user.id)
         db.session.add(db_add)
         db.session.commit()
-        return redirect(url_for('FrontG.TelegramSignIN'))
-    return render_template('tel.html', title='Telegram Login', form=form)
+        return redirect(url_for('FrontG.SignInCodeReq'))
+    return render_template('ApiForm.html', title='Telegram Login', form=form)
 
 
-@FrontG.route('/Check')
-async def check():
-    form = TeleForm()
-    if form.valid_on_sumbit():
-        return form.TelegramSignInCode.data
+@FrontG.route('/SignInCodeReq', methods=['GET','POST'])
+@login_required                                                                                            
+def SignInCode():
+    form = TeleFormConfirmationCode()
+    if form.validate_on_submit():
+        code = form.TelegramSignInCode.data
+        SignInC = {"UserID": current_user.id, "SignInCode":int(code)}
+        send_req = requests.post(f"{request_url}/SignInCode", json=SignInC)
+    
+    return render_template('ApiForm.html', form=form)
 
 
 @FrontG.route('/logout')
@@ -83,3 +92,6 @@ def logout():
     logout_user()
     flash("Logged out")
     return redirect(url_for('FrontG.login'))
+
+
+
