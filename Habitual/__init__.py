@@ -1,8 +1,7 @@
 from flask import Flask
 
 from .Routes.FrontGate import FrontG
-from .ext import db, migrate, bcrypt,login_manager
-
+from .ext import db, migrate, bcrypt, login_manager
 
 
 def create_app():

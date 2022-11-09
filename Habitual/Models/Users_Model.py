@@ -15,22 +15,6 @@ def user_loader(user_id):
         user.id = user_id
         user.name = user_search.UserName
         return user
-    # return User.query.get(user_id)
-
-
-
-'''
-@login_manager.request_loader
-def request_loader(request):
-    user_id = request.form.get('UID')
-    if user_id not in users:
-        return
-
-    user = User()
-    user.id = user_id
-    return user
-
-'''
 
 
 class User(db.Model,UserMixin):
