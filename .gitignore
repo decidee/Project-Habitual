@@ -1,3 +1,11 @@
-1
 *.session
 Tasks
+__pycache__
+.env
+Notes
+test.py
+dbtestroute.py
+clienttest.py
+Backlog - Notes
+*.session
+Invite_gen.py
