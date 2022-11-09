@@ -1,5 +1,3 @@
-*.session
-Tasks
 __pycache__
 .env
 Notes
