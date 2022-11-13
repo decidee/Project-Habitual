@@ -1,11 +1,14 @@
-*.session
-Tasks
 __pycache__
+*.session
 .env
+Log File
 Notes
 test.py
 dbtestroute.py
 clienttest.py
 Backlog - Notes
-*.session
 Invite_gen.py
+async test.py
+db_gen.py
+4
+

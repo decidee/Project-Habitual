@@ -1,10 +1,11 @@
 import os
+import time
 from plistlib import UID
 from dotenv import load_dotenv
 from flask import render_template, redirect, url_for, request, Blueprint, session, flash
 from flask_login import login_user,current_user,logout_user, login_required
 
-from ..Forms.forms import RegisterationForm, LoginForm, TeleForm, TeleFormConfirmationCode
+from ..Forms.forms import RegisterationForm, LoginForm, TeleForm
 from ..Models.Users_Model import User, Tele
 from ..ext import db, bcrypt
 import requests
@@ -47,7 +48,7 @@ def registration():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(PhoneNumber=form.phonenumber.data).first()
+        user = User.query.filter_by(PhoneNumber=str(form.phonenumber.data)).first()
         if user and bcrypt.check_password_hash(user.Password, form.password.data):
             login_user(user, remember=form.remember.data)
             flash("Login Successful", category='info')
@@ -63,6 +64,7 @@ def home():
 
 
 @FrontG.route("/telegramreg", methods=["GET", "POST"])
+@login_required
 def telegramreg():
     form = TeleForm()
     if form.validate_on_submit():
@@ -71,27 +73,29 @@ def telegramreg():
         db_add = Tele(ApiId=api_id,ApiHash=api_hash,OwnerAcc=current_user.id)
         db.session.add(db_add)
         db.session.commit()
-        return redirect(url_for('FrontG.SignInCodeReq'))
+        UserID = {"UserID": current_user.id}
+        send_req = requests.post(f"{request_url}/QrLogin", json=UserID)
+        flash("Please Wait a few seconds.", category='info')
+        time.sleep(2)
+        return redirect(url_for('FrontG.SignInCode'))
     return render_template('ApiForm.html', title='Telegram Login', form=form)
 
 
-@FrontG.route('/SignInCodeReq', methods=['GET','POST'])
+@FrontG.route('/SignInCode', methods=['GET'])
 @login_required                                                                                            
 def SignInCode():
-    form = TeleFormConfirmationCode()
-    if form.validate_on_submit():
-        code = form.TelegramSignInCode.data
-        SignInC = {"UserID": current_user.id, "SignInCode":int(code)}
-        send_req = requests.post(f"{request_url}/SignInCode", json=SignInC)
+    time.sleep(2)
+    db_query = Tele.query.filter_by(OwnerAcc=current_user.id).first() 
+    url_token = db_query.SignInCode
     
-    return render_template('ApiForm.html', form=form)
+    if db_query.Auth:
+        flash("Successfully Authenticated", category='success')
+        return redirect(url_for('FrontG.home'))
 
+    return render_template('QrLogin.html', url_token=url_token)
 
 @FrontG.route('/logout')
 def logout():
     logout_user()
     flash("Logged out")
     return redirect(url_for('FrontG.login'))
-
-
-
