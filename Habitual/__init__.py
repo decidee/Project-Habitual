@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_qrcode import QRcode
 
 from .Routes.FrontGate import FrontG
 from .ext import db, migrate, bcrypt, login_manager
@@ -11,6 +12,7 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app,db)
     bcrypt.init_app(app)
+    QRcode(app)
     login_manager.init_app(app)
     login_manager.login_view = 'FrontG.login'
     login_manager.login_message_category = 'info'

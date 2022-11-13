@@ -46,8 +46,3 @@ class TeleForm(FlaskForm):
     Api_Hash = StringField('Api Hash', validators=[DataRequired(message="Please Input your API Hash")])
 
     submit = SubmitField('Submit')
-
-
-class TeleFormConfirmationCode(FlaskForm):
-    TelegramSignInCode = StringField('Telegram SignIn Code', validators=[DataRequired()])
-    submit = SubmitField('Submit')
