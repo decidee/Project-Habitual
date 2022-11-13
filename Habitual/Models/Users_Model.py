@@ -36,8 +36,10 @@ class Tele(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     ApiId = db.Column(db.String(50))
     ApiHash = db.Column(db.String(128))
+    SignInCode = db.Column(db.String(300))
     OwnerAcc = db.Column(db.ForeignKey('UserAcc.UID'),unique=True)
     SessionFile = db.Column(db.String(2000), nullable=True)
+    Auth = db.Column(db.Boolean, default=False)
 
 
 class Invites(db.Model):
