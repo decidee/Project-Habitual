@@ -80,7 +80,8 @@ async def Qrlogger(C_User):
                     logging.debug(f"USER {C_User} is Authorized")
                     sessionstring = client.session.save()
                     add_on = session.query(Tele).filter_by(OwnerAcc=C_User).update(dict(SessionFile=sessionstring,Auth=True))
-                    session.commit() 
+                    session.commit()
+                    contact(C_User) # Untested
 
             except TimeoutError:
                 await qr_login.recreate()
@@ -133,7 +134,7 @@ async def ClientContact(C_User):
         contact_list.append(contact_dict)
 
     add_on = session.query(Tele).filter_by(OwnerAcc=C_User).update(dict(Contact=contact_list))
-    session.commit() 
+    session.commit()
     logging.debug(f'Contact Created')
     return
 
@@ -144,7 +145,7 @@ async def contact(idata:UserID):
     task = asyncio.create_task(ClientContact(current_user))
     return "DONE"
 
-'''
+
 async def contact_takeout(C_User):
     UserInfo1 = session.query(Tele).filter_by(OwnerAcc=C_User).first()
     client = TelegramClient(StringSession(UserInfo1.SessionFile), UserInfo1.ApiId, UserInfo1.ApiHash)
@@ -170,4 +171,3 @@ async def ContactTakeout(idata:UserID):
     task = asyncio.create_task(contact_takeout(current_user))
     logging.debug("NEW : %s", task)
     return "DONE"
-'''
