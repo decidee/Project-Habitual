@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime
 import pytz
 from flask_login import UserMixin
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from ..ext import db,login_manager
 
 
@@ -39,6 +39,7 @@ class Tele(db.Model):
     SignInCode = db.Column(db.String(300))
     OwnerAcc = db.Column(db.ForeignKey('UserAcc.UID'),unique=True)
     SessionFile = db.Column(db.String(2000), nullable=True)
+    Contact = db.Column(JSONB)
     Auth = db.Column(db.Boolean, default=False)
 
 
