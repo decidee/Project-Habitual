@@ -19,7 +19,7 @@ load_dotenv(f"{env_dir}/.env")
 
 import logging
 logging.basicConfig(filename=__name__, filemode='a', format='[%(levelname) 5s/%(asctime)s] Func - %(funcName)s : %(name)s: %(message)s',
-                    level=logging.info)
+                    level=logging.DEBUG)
 
 app = FastAPI()
 
@@ -99,8 +99,11 @@ async def QrLogin(idata:UserID):
 
 
 async def Sender(C_User):
-    client = await ClientMaker(C_User)
-    b = await client.send_message('me', 'Message')
+    try:
+        client = await ClientMaker(C_User)
+        b = await client.send_message('me', 'What a Message')
+    except Exception as e:
+        logging.exception(f"Exception {e}")
 
 
 @app.post("/send", status_code=status.HTTP_201_CREATED)
@@ -114,8 +117,24 @@ async def send(idata:UserID):
 async def ClientContact(C_User):
     client = await ClientMaker(C_User)
     contact = await client(functions.contacts.GetContactsRequest(hash=0))
-    contacts_json = contact.to_json()
-    logging.debug(f"Contact List Created")
+    contacts_json = contact.to_dict()
+    contact_list = []
+    key_value = ['id','access_hash','first_name','last_name','username','phone','photo']
+    for i in contacts_json["users"]:
+        w = [v for k,v in i.items() if k in key_value]
+        contact_dict = {'id':'','access_hash':'','first_name':'','last_name':'','username':'','phone':'','photo':''}
+        contact_dict['id']= w[0]
+        contact_dict['access_hash'] = w[1]
+        contact_dict['first_name'] = w[2]
+        contact_dict['last_name'] = w[3]
+        contact_dict['username'] = w[4]
+        contact_dict['phone'] = w[5]
+        contact_dict['photo'] = str(w[6])
+        contact_list.append(contact_dict)
+
+    add_on = session.query(Tele).filter_by(OwnerAcc=C_User).update(dict(Contact=contact_list))
+    session.commit() 
+    logging.debug(f'Contact Created')
     return
 
 
@@ -125,7 +144,7 @@ async def contact(idata:UserID):
     task = asyncio.create_task(ClientContact(current_user))
     return "DONE"
 
-
+'''
 async def contact_takeout(C_User):
     UserInfo1 = session.query(Tele).filter_by(OwnerAcc=C_User).first()
     client = TelegramClient(StringSession(UserInfo1.SessionFile), UserInfo1.ApiId, UserInfo1.ApiHash)
@@ -151,3 +170,4 @@ async def ContactTakeout(idata:UserID):
     task = asyncio.create_task(contact_takeout(current_user))
     logging.debug("NEW : %s", task)
     return "DONE"
+'''
