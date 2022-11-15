@@ -1,13 +1,14 @@
 from flask import Flask
 from flask_qrcode import QRcode
-
+import os
 from .Routes.FrontGate import FrontG
 from .ext import db, migrate, bcrypt, login_manager
 
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_pyfile('.env')
+    env_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
+    app.config.from_pyfile(f"{env_dir}/.env")
 
     db.init_app(app)
     migrate.init_app(app,db)
