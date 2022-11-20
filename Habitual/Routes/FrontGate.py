@@ -5,7 +5,7 @@ from flask import render_template, redirect, url_for, request, Blueprint, sessio
 from flask_login import login_user,current_user,logout_user, login_required
 
 from ..Forms.forms import RegisterationForm, LoginForm, TeleForm
-from ..Models.Users_Model import User, Tele
+from ..Models.Users_Model import User, Tele, Invites
 from ..ext import db, bcrypt
 import requests
 
@@ -98,3 +98,26 @@ def logout():
     logout_user()
     flash("Logged out")
     return redirect(url_for('FrontG.login'))
+
+
+from secrets import token_hex
+
+
+
+def generate_word(number):
+    RandomList = []
+    for i in range(number): 
+        gen_word = (token_hex(3))
+        RandomList.append(gen_word)
+    return RandomList
+
+
+
+@FrontG.route('/db/<num>')
+def db_add(num):
+    word = generate_word(int(num))
+    for i in word:
+        db_add = Invites(InviteWords=i)
+        db.session.add(db_add)
+    db.session.commit()
+    return "Completed"
